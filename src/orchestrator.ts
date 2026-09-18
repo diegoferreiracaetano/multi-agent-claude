@@ -73,7 +73,13 @@ export class CodeReviewOrchestrator {
     this.maxFiles = options.maxFiles ?? 8;
     this.maxRetries = options.maxRetries ?? 3;
     this.fetchTimeoutMs = options.fetchTimeoutMs ?? 60_000;
-    this.fileTimeoutMs = options.fileTimeoutMs ?? 120_000;
+    // A per-file review is not one API call — it's an outer agent delegating,
+    // via the Task tool, to 3 subagents that each may invoke Skills and (for
+    // code-quality on JS/TS) the ESLint MCP server. Measured against a real
+    // PR, this routinely took >120s per file, causing every retry attempt to
+    // time out identically (retries don't help when the budget itself is too
+    // small for the work, only for genuinely transient failures).
+    this.fileTimeoutMs = options.fileTimeoutMs ?? 240_000;
     this.estimatedTokensPerFile = options.estimatedTokensPerFile ?? 8000;
   }
 

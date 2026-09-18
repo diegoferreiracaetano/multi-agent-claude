@@ -1,0 +1,374 @@
+{
+  "pullRequest": {
+    "owner": "kingpicollo222",
+    "repo": "simple-todo-app",
+    "number": 2
+  },
+  "fileReviews": [
+    {
+      "file": "src/search.js",
+      "codeQuality": {
+        "file": "src/search.js",
+        "issues": [
+          {
+            "line": 4,
+            "severity": "medium",
+            "category": "best-practice",
+            "description": "Using 'var' instead of 'const' or 'let' for variable declaration. 'var' has function scope and can lead to unexpected behavior.",
+            "suggestion": "Replace 'var results = []' with 'const results = []' since the array reference doesn't need reassignment."
+          },
+          {
+            "line": 5,
+            "severity": "medium",
+            "category": "best-practice",
+            "description": "Using 'var' in loop declaration. 'var' is function-scoped and can cause closure issues.",
+            "suggestion": "Replace 'var i = 0' with 'let i = 0' for proper block scoping."
+          },
+          {
+            "line": 6,
+            "severity": "medium",
+            "category": "best-practice",
+            "description": "Using 'var' for loop variable inside the loop body.",
+            "suggestion": "Replace 'var t = todos[i]' with 'const t = todos[i]' since it's not reassigned."
+          },
+          {
+            "line": 7,
+            "severity": "high",
+            "category": "bug-risk",
+            "description": "No null/undefined check on 't.title' before calling toLowerCase(). Will throw TypeError if title is null or undefined.",
+            "suggestion": "Add safety check: 'if (t && t.title && t.title.toLowerCase().indexOf(query.toLowerCase()) !== -1)' or use optional chaining: 't.title?.toLowerCase()'"
+          },
+          {
+            "line": 15,
+            "severity": "high",
+            "category": "bug-risk",
+            "description": "Using loose equality (==) instead of strict equality (===). Can lead to unexpected type coercion.",
+            "suggestion": "Replace 'status == \"all\"' with 'status === \"all\"' for safer comparison."
+          },
+          {
+            "line": 18,
+            "severity": "high",
+            "category": "bug-risk",
+            "description": "Using loose equality (==) instead of strict equality (===).",
+            "suggestion": "Replace 'status == \"active\"' with 'status === \"active\"'."
+          },
+          {
+            "line": 21,
+            "severity": "high",
+            "category": "bug-risk",
+            "description": "Using loose equality (==) instead of strict equality (===).",
+            "suggestion": "Replace 'status == \"done\"' with 'status === \"done\"'."
+          },
+          {
+            "line": 28,
+            "severity": "low",
+            "category": "best-practice",
+            "description": "Using 'var' instead of modern variable declaration.",
+            "suggestion": "Replace 'var sorted = results' with 'let sorted = results' or create a copy with 'const sorted = [...results]' to avoid mutating the original."
+          },
+          {
+            "line": 28,
+            "severity": "high",
+            "category": "bug-risk",
+            "description": "Direct assignment without cloning. The sort() method mutates the original array, affecting the 'results' parameter.",
+            "suggestion": "Clone the array first: 'const sorted = [...results]' before sorting to avoid side effects."
+          },
+          {
+            "line": 5,
+            "severity": "medium",
+            "category": "performance",
+            "description": "Using traditional for-loop instead of more modern and readable array methods.",
+            "suggestion": "Replace with: 'return todos.filter(t => t.title?.toLowerCase().includes(query.toLowerCase()))' for better readability and performance."
+          },
+          {
+            "line": 7,
+            "severity": "low",
+            "category": "performance",
+            "description": "query.toLowerCase() is called on every iteration. Should be computed once.",
+            "suggestion": "Move 'const lowerQuery = query.toLowerCase()' outside the loop and reuse it."
+          },
+          {
+            "line": 52,
+            "severity": "critical",
+            "category": "security",
+            "description": "RegExp constructor with user input without escaping. Vulnerable to RegExp Denial of Service (ReDoS) and can cause exceptions with special regex characters.",
+            "suggestion": "Escape special regex characters: 'const escapedQuery = query.replace(/[.*+?^${}()|[\\]\\\\]/g, \"\\\\$&\"); const re = new RegExp(escapedQuery, \"gi\");'"
+          },
+          {
+            "line": 53,
+            "severity": "critical",
+            "category": "security",
+            "description": "Returning raw HTML with <mark> tags. This could lead to XSS if the title contains user-generated content with HTML/script tags.",
+            "suggestion": "HTML-escape the title before adding markup, or return structured data instead of HTML strings. Consider: escaping title first, then wrapping matches, or using a safe templating approach."
+          },
+          {
+            "line": 36,
+            "severity": "medium",
+            "category": "bug-risk",
+            "description": "No validation on Date parsing. Invalid dates will result in NaN comparisons.",
+            "suggestion": "Add date validation: 'const dateA = new Date(a.createdAt); const dateB = new Date(b.createdAt); if (isNaN(dateA) || isNaN(dateB)) return 0; return dateA - dateB;'"
+          },
+          {
+            "line": 45,
+            "severity": "low",
+            "category": "bug-risk",
+            "description": "No validation of input parameters. Function doesn't handle null/undefined/empty inputs gracefully.",
+            "suggestion": "Add input validation at the start: 'if (!todos || !Array.isArray(todos)) return []; if (!query || typeof query !== \"string\") query = \"\";'"
+          },
+          {
+            "line": 30,
+            "severity": "low",
+            "category": "maintainability",
+            "description": "Manual string comparison for sorting is verbose.",
+            "suggestion": "Use localeCompare for string sorting: 'sorted.sort((a, b) => a.title.localeCompare(b.title))' for proper internationalization support."
+          }
+        ],
+        "overallScore": 42,
+        "summary": "This file has critical security vulnerabilities in the highlightMatch function (XSS and ReDoS risks) and multiple bug-risk issues including loose equality comparisons, missing null checks, and array mutation. The code uses outdated JavaScript patterns (var, traditional loops) affecting maintainability. Immediate attention needed for security issues before production use."
+      },
+      "testCoverage": {
+        "file": "src/search.js",
+        "hasTests": false,
+        "testFiles": [],
+        "untestedPaths": [
+          {
+            "type": "edge-case",
+            "location": "searchTodos() - empty query parameter",
+            "priority": "high",
+            "reasoning": "Empty or whitespace-only queries could return all todos or cause unexpected behavior. This is a common user input scenario that should be handled explicitly.",
+            "suggestedTest": "Test searchTodos(todos, '') and searchTodos(todos, '   ') to verify expected behavior (return empty array or all todos)"
+          },
+          {
+            "type": "edge-case",
+            "location": "searchTodos() - null/undefined query",
+            "priority": "critical",
+            "reasoning": "Passing null or undefined as query will cause a runtime error when calling .toLowerCase(). This would crash the application.",
+            "suggestedTest": "Test searchTodos(todos, null) and searchTodos(todos, undefined) - should handle gracefully or throw descriptive error"
+          },
+          {
+            "type": "edge-case",
+            "location": "searchTodos() - todos with missing title property",
+            "priority": "critical",
+            "reasoning": "If a todo object lacks a 'title' property, accessing t.title.toLowerCase() will throw 'Cannot read property toLowerCase of undefined', causing a crash.",
+            "suggestedTest": "Test searchTodos([{completed: true}], 'test') to verify error handling for malformed todo objects"
+          },
+          {
+            "type": "edge-case",
+            "location": "searchTodos() - empty todos array",
+            "priority": "medium",
+            "reasoning": "Should safely return empty array, but needs verification to ensure loop doesn't cause issues.",
+            "suggestedTest": "Test searchTodos([], 'query') returns []"
+          },
+          {
+            "type": "edge-case",
+            "location": "searchTodos() - null/undefined todos parameter",
+            "priority": "critical",
+            "reasoning": "Attempting to access .length on null/undefined will throw 'Cannot read property length of null/undefined', crashing the application.",
+            "suggestedTest": "Test searchTodos(null, 'query') and searchTodos(undefined, 'query') - should handle gracefully"
+          },
+          {
+            "type": "branch",
+            "location": "filterByStatus() - unrecognized status values",
+            "priority": "high",
+            "reasoning": "If status is anything other than 'all', 'active', or 'done', the function falls through to return todos unchanged. This implicit behavior should be tested or made explicit.",
+            "suggestedTest": "Test filterByStatus(todos, 'invalid') and filterByStatus(todos, null) to verify fallback behavior"
+          },
+          {
+            "type": "edge-case",
+            "location": "filterByStatus() - todos without completed property",
+            "priority": "high",
+            "reasoning": "Filter functions check t.completed, which could be undefined for malformed todos, leading to unexpected filtering results.",
+            "suggestedTest": "Test filterByStatus([{title: 'test'}], 'active') to verify handling of todos missing completed property"
+          },
+          {
+            "type": "branch",
+            "location": "sortResults() - unrecognized sortBy values",
+            "priority": "medium",
+            "reasoning": "If sortBy is neither 'title' nor 'date', results are returned unsorted. This implicit no-op should be tested.",
+            "suggestedTest": "Test sortResults(results, 'invalid') and sortResults(results, null) to verify no sorting occurs"
+          },
+          {
+            "type": "edge-case",
+            "location": "sortResults() - todos missing createdAt for date sort",
+            "priority": "high",
+            "reasoning": "When sortBy is 'date', accessing a.createdAt or b.createdAt on todos without this property will result in 'Invalid Date' comparisons, producing unpredictable sort order.",
+            "suggestedTest": "Test sortResults([{title: 'a'}, {title: 'b'}], 'date') to verify handling of missing createdAt"
+          },
+          {
+            "type": "edge-case",
+            "location": "sortResults() - invalid date strings in createdAt",
+            "priority": "medium",
+            "reasoning": "new Date() with invalid date strings returns Invalid Date, which can cause NaN in subtraction, leading to incorrect sort order.",
+            "suggestedTest": "Test sortResults([{createdAt: 'invalid'}, {createdAt: '2024-01-01'}], 'date') to verify sort stability"
+          },
+          {
+            "type": "function",
+            "location": "sortResults() - mutation warning",
+            "priority": "high",
+            "reasoning": "Array.sort() mutates the original array. Since 'sorted' is assigned as 'results' (not a copy), this mutates the input parameter, which could cause unexpected side effects.",
+            "suggestedTest": "Test that sortResults() does not mutate the original input array, or document this as expected behavior"
+          },
+          {
+            "type": "edge-case",
+            "location": "highlightMatch() - special regex characters in query",
+            "priority": "high",
+            "reasoning": "If query contains regex special characters like '.', '*', '(', '[', etc., new RegExp(query, 'gi') will throw a SyntaxError or produce incorrect matches.",
+            "suggestedTest": "Test highlightMatch('test (item)', '(item)') to verify proper escaping of regex special characters"
+          },
+          {
+            "type": "edge-case",
+            "location": "highlightMatch() - null/undefined query",
+            "priority": "critical",
+            "reasoning": "Passing null or undefined to new RegExp() will convert to string 'null'/'undefined' and create a valid but incorrect regex pattern.",
+            "suggestedTest": "Test highlightMatch('title', null) and highlightMatch('title', undefined) to verify error handling"
+          },
+          {
+            "type": "edge-case",
+            "location": "highlightMatch() - empty query",
+            "priority": "medium",
+            "reasoning": "Empty query creates a regex that matches every position, potentially wrapping every character in <mark> tags or causing unexpected output.",
+            "suggestedTest": "Test highlightMatch('test', '') to verify expected behavior with empty query"
+          },
+          {
+            "type": "function",
+            "location": "search() - integration path",
+            "priority": "high",
+            "reasoning": "The search() function chains all other functions but has no standalone tests visible. Edge cases from component functions could compound.",
+            "suggestedTest": "Test search() with various combinations: empty query, null status, invalid sortBy, empty todos array"
+          }
+        ],
+        "coverageEstimate": 0,
+        "summary": "This file has no visible test coverage and contains multiple critical vulnerabilities including null/undefined parameter handling, missing property access crashes, and regex injection risks. The searchTodos() and highlightMatch() functions are particularly dangerous as they will crash on null inputs or special characters. Additionally, sortResults() mutates its input array, which could cause bugs in calling code."
+      },
+      "refactorings": {
+        "file": "src/search.js",
+        "suggestions": [
+          {
+            "type": "modernize",
+            "location": "searchTodos function (lines 3-11)",
+            "impact": "high",
+            "description": "Replace var declarations with const/let and use modern for-of loop with filter and includes method",
+            "before": "export function searchTodos(todos, query) {\n  var results = [];\n  for (var i = 0; i < todos.length; i++) {\n    var t = todos[i];\n    if (t.title.toLowerCase().indexOf(query.toLowerCase()) !== -1) {\n      results.push(t);\n    }\n  }\n  return results;\n}",
+            "after": "export function searchTodos(todos, query) {\n  const lowerQuery = query.toLowerCase();\n  return todos.filter(todo => \n    todo.title.toLowerCase().includes(lowerQuery)\n  );\n}",
+            "benefits": "Eliminates var keyword reducing scope issues, uses modern includes() instead of indexOf, leverages filter() for cleaner functional code, and caches toLowerCase() call for better performance"
+          },
+          {
+            "type": "modernize",
+            "location": "filterByStatus function (lines 13-24)",
+            "impact": "medium",
+            "description": "Replace loose equality (==) with strict equality (===) and modernize arrow functions",
+            "before": "export function filterByStatus(todos, status) {\n  if (status == 'all') {\n    return todos;\n  }\n  if (status == 'active') {\n    return todos.filter(function (t) { return !t.completed; });\n  }\n  if (status == 'done') {\n    return todos.filter(function (t) { return t.completed; });\n  }\n  return todos;\n}",
+            "after": "export function filterByStatus(todos, status) {\n  if (status === 'all') {\n    return todos;\n  }\n  if (status === 'active') {\n    return todos.filter(todo => !todo.completed);\n  }\n  if (status === 'done') {\n    return todos.filter(todo => todo.completed);\n  }\n  return todos;\n}",
+            "benefits": "Prevents type coercion bugs with strict equality, uses concise arrow functions, and improves code consistency"
+          },
+          {
+            "type": "simplify",
+            "location": "filterByStatus function (lines 13-24)",
+            "impact": "medium",
+            "description": "Replace cascading if statements with switch statement or object lookup for better readability",
+            "before": "export function filterByStatus(todos, status) {\n  if (status == 'all') {\n    return todos;\n  }\n  if (status == 'active') {\n    return todos.filter(function (t) { return !t.completed; });\n  }\n  if (status == 'done') {\n    return todos.filter(function (t) { return t.completed; });\n  }\n  return todos;\n}",
+            "after": "export function filterByStatus(todos, status) {\n  const filters = {\n    all: () => todos,\n    active: () => todos.filter(todo => !todo.completed),\n    done: () => todos.filter(todo => todo.completed)\n  };\n  \n  return (filters[status] || filters.all)();\n}",
+            "benefits": "Eliminates repetitive if statements, makes adding new statuses easier, and provides clearer intent through object structure"
+          },
+          {
+            "type": "modernize",
+            "location": "sortResults function (lines 26-38)",
+            "impact": "high",
+            "description": "Replace var with const/let, modernize arrow functions, and use localeCompare for string comparison",
+            "before": "export function sortResults(results, sortBy) {\n  var sorted = results;\n  if (sortBy === 'title') {\n    sorted.sort(function (a, b) {\n      if (a.title < b.title) { return -1; }\n      if (a.title > b.title) { return 1; }\n      return 0;\n    });\n  } else if (sortBy === 'date') {\n    sorted.sort(function (a, b) {\n      return new Date(a.createdAt) - new Date(b.createdAt);\n    });\n  }\n  return sorted;\n}",
+            "after": "export function sortResults(results, sortBy) {\n  const sorted = [...results];\n  \n  if (sortBy === 'title') {\n    sorted.sort((a, b) => a.title.localeCompare(b.title));\n  } else if (sortBy === 'date') {\n    sorted.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));\n  }\n  \n  return sorted;\n}",
+            "benefits": "Creates a copy to avoid mutating input array, uses localeCompare for proper internationalized string sorting, and modernizes with arrow functions"
+          },
+          {
+            "type": "pattern-improvement",
+            "location": "sortResults function (lines 26-38)",
+            "impact": "medium",
+            "description": "Use strategy pattern with object lookup instead of if-else chain for extensibility",
+            "before": "export function sortResults(results, sortBy) {\n  var sorted = results;\n  if (sortBy === 'title') {\n    sorted.sort(function (a, b) {\n      if (a.title < b.title) { return -1; }\n      if (a.title > b.title) { return 1; }\n      return 0;\n    });\n  } else if (sortBy === 'date') {\n    sorted.sort(function (a, b) {\n      return new Date(a.createdAt) - new Date(b.createdAt);\n    });\n  }\n  return sorted;\n}",
+            "after": "export function sortResults(results, sortBy) {\n  const sortStrategies = {\n    title: (a, b) => a.title.localeCompare(b.title),\n    date: (a, b) => new Date(a.createdAt) - new Date(b.createdAt)\n  };\n  \n  const compareFn = sortStrategies[sortBy];\n  if (!compareFn) return results;\n  \n  return [...results].sort(compareFn);\n}",
+            "benefits": "Makes adding new sort options trivial, separates sorting logic clearly, and improves testability of individual sort strategies"
+          },
+          {
+            "type": "modernize",
+            "location": "search function (lines 40-45)",
+            "impact": "low",
+            "description": "Replace var with const and use more descriptive variable names",
+            "before": "export function search(todos, query, status, sortBy) {\n  var matched = searchTodos(todos, query);\n  var filtered = filterByStatus(matched, status);\n  var sorted = sortResults(filtered, sortBy);\n  return sorted;\n}",
+            "after": "export function search(todos, query, status, sortBy) {\n  const matchedTodos = searchTodos(todos, query);\n  const filteredTodos = filterByStatus(matchedTodos, status);\n  const sortedTodos = sortResults(filteredTodos, sortBy);\n  return sortedTodos;\n}",
+            "benefits": "Eliminates var keyword for block-scoped const, improves variable naming for better self-documentation"
+          },
+          {
+            "type": "simplify",
+            "location": "search function (lines 40-45)",
+            "impact": "low",
+            "description": "Use functional composition to eliminate intermediate variables",
+            "before": "export function search(todos, query, status, sortBy) {\n  var matched = searchTodos(todos, query);\n  var filtered = filterByStatus(matched, status);\n  var sorted = sortResults(filtered, sortBy);\n  return sorted;\n}",
+            "after": "export function search(todos, query, status, sortBy) {\n  return sortResults(\n    filterByStatus(\n      searchTodos(todos, query),\n      status\n    ),\n    sortBy\n  );\n}",
+            "benefits": "Reduces line count, eliminates unnecessary intermediate variables, and makes the data transformation pipeline more explicit"
+          },
+          {
+            "type": "modernize",
+            "location": "highlightMatch function (lines 47-50)",
+            "impact": "medium",
+            "description": "Replace var with const and add input sanitization for RegExp special characters",
+            "before": "export function highlightMatch(title, query) {\n  var re = new RegExp(query, 'gi');\n  return title.replace(re, '<mark>$&</mark>');\n}",
+            "after": "export function highlightMatch(title, query) {\n  const escapedQuery = query.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');\n  const re = new RegExp(escapedQuery, 'gi');\n  return title.replace(re, '<mark>$&</mark>');\n}",
+            "benefits": "Prevents RegExp injection attacks when query contains special characters like '.', '*', or '?', making the function more robust"
+          },
+          {
+            "type": "pattern-improvement",
+            "location": "Overall file structure",
+            "impact": "medium",
+            "description": "Add input validation and consider using a TodoSearch class for better encapsulation",
+            "before": "export function search(todos, query, status, sortBy) {\n  var matched = searchTodos(todos, query);\n  var filtered = filterByStatus(matched, status);\n  var sorted = sortResults(filtered, sortBy);\n  return sorted;\n}",
+            "after": "export function search(todos, query, status = 'all', sortBy = 'title') {\n  if (!Array.isArray(todos)) {\n    throw new TypeError('todos must be an array');\n  }\n  if (typeof query !== 'string') {\n    throw new TypeError('query must be a string');\n  }\n  \n  return sortResults(\n    filterByStatus(\n      searchTodos(todos, query),\n      status\n    ),\n    sortBy\n  );\n}",
+            "benefits": "Adds default parameter values for better API, includes input validation to catch errors early, and improves function reliability"
+          }
+        ],
+        "summary": "This file extensively uses outdated ES5 patterns including var declarations, function expressions, indexOf, and verbose comparison logic. Modernizing to ES6+ with const/let, arrow functions, includes(), localeCompare(), and strategic use of filter/map will significantly improve readability, reduce bugs from scope issues and type coercion, and make the code more maintainable. The current implementation also lacks input validation and has a potential RegExp injection vulnerability in highlightMatch."
+      }
+    }
+  ],
+  "summary": {
+    "totalFiles": 1,
+    "overallScore": 42,
+    "criticalIssues": 2,
+    "highPriorityTests": 11,
+    "refactoringOpportunities": 9
+  },
+  "recommendations": [
+    {
+      "priority": "critical",
+      "category": "code-quality",
+      "description": "7 high/critical issue(s): No null/undefined check on 't.title' before calling toLowerCase(). Will throw TypeError if title is null or undefined.",
+      "files": [
+        "src/search.js"
+      ]
+    },
+    {
+      "priority": "critical",
+      "category": "test-coverage",
+      "description": "11 high-priority untested path(s): Empty or whitespace-only queries could return all todos or cause unexpected behavior. This is a common user input scenario that should be handled explicitly.",
+      "files": [
+        "src/search.js"
+      ]
+    },
+    {
+      "priority": "medium",
+      "category": "refactoring",
+      "description": "2 high-impact refactor(s): Replace var declarations with const/let and use modern for-of loop with filter and includes method",
+      "files": [
+        "src/search.js"
+      ]
+    }
+  ],
+  "metadata": {
+    "analyzedAt": "2026-09-18T04:25:16.267Z",
+    "duration": 191955,
+    "agentVersions": {
+      "code-quality-analyzer": "claude-sonnet-4-5-20250929",
+      "test-coverage-analyzer": "claude-sonnet-4-5-20250929",
+      "refactoring-suggester": "claude-sonnet-4-5-20250929"
+    }
+  }
+}

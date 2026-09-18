@@ -164,6 +164,39 @@ gaps, and 5 concrete before/after refactor suggestions. This is the proof that t
 MCP fetch → parallel Task-based delegation → Skills → Zod validation → aggregation — genuinely works
 beyond the mocked unit tests, before ever pointing it at the three required PRs.
 
+## 9b. A real timeout bug, found by running against a different real PR
+
+Once pointed at the three actually-required PRs (`kingpicollo222/simple-todo-app`, a public fork of
+the assignment's template repo — see `CHECKLIST.md` for why a substitute repo was needed), PR #1's
+first attempt **failed outright**: both changed files (`src/validators.js`,
+`tests/validators.test.js`) hit `AGENT_TIMEOUT` on *all three* retry attempts:
+
+```
+2026-09-18 01:15:59 [warn]: Skipping file after review failed
+{ "file": "src/validators.js", "error": "[RETRY_EXHAUSTED] ... [AGENT_TIMEOUT] Timed out reviewing file src/validators.js" }
+```
+
+**Root cause:** `fileTimeoutMs` defaulted to `120_000` (2 minutes) — a number that felt reasonable
+against the earlier single-file test PR, but a per-file review here is genuinely expensive: one outer
+`query()` call delegates via `Task` to all 3 subagents, one of which (`code-quality-analyzer`) also
+invokes the ESLint MCP server as a separate tool call. For this PR's files, that routinely took longer
+than 120 seconds. Because `withRetry` retries with the *same* timeout budget every attempt, and the
+task consistently needed more time (not intermittently failing), **all three retries timed out
+identically** — retrying bought nothing, since the problem wasn't transient.
+
+**Fix:** raised the default to `240_000` (4 minutes) in `CodeReviewOrchestrator`'s constructor. All
+three required PRs then completed on the very first attempt — durations were 250s, 192s, and 482s
+respectively (PR #3's `subscription.js` took the longest, consistent with it also triggering the most
+findings: 5 critical issues).
+
+**The generalizable lesson** (this is basically System 1's "retry-vs-escalate" lesson from a *different*
+capstone in this same course, applied to timeouts instead of missing data): **a timeout budget and a
+retry count are only useful against different failure classes.** Retries help when failure is
+*probabilistic* (a flaky network blip that might not recur). They do nothing when failure is
+*deterministic given the budget* (the work genuinely needs more time than you've allotted it, every
+time). Diagnosing which kind of failure you're looking at — here, by noticing all 3 attempts failed the
+same way, not intermittently — is what tells you whether to add retries or raise the budget.
+
 ## 10. Quick command reference
 
 ```bash

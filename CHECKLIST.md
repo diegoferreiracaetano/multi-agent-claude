@@ -1,7 +1,6 @@
 # Submission Checklist — Multi-Agent Code Review System
 
-Mapped directly to the project rubric. ✅ = verified against real code/output in this repo. ⏳ = pending
-(blocked on confirming the exact test-repo name — see note at the bottom).
+Mapped directly to the project rubric. Every item verified against real code/output in this repo.
 
 ## System Configuration
 
@@ -63,17 +62,38 @@ Mapped directly to the project rubric. ✅ = verified against real code/output i
 - [x] TypeScript strict-ish typing throughout (no stray `any` in the reviewed files); descriptive
       camelCase naming; clear `agents/` / `config/` / `prompts/` / `utils/` separation.
 
-## Final Deliverables — 9 PR reports (⏳ blocked, see below)
+## Final Deliverables — 9 PR reports
 
-- [ ] 3 reports for PR #1 — JSON, MD, HTML
-- [ ] 3 reports for PR #2 — JSON, MD, HTML
-- [ ] 3 reports for PR #3 — JSON, MD, HTML
+- [x] 3 reports for PR #1 ("add clean code fixture") — `kingpicollo222-simple-todo-app-1.{json,md,html}`
+      — score 80/100, 2 files (`src/validators.js`, `tests/validators.test.js`), 15 issues total.
+- [x] 3 reports for PR #2 ("Add search functionality for todos") —
+      `kingpicollo222-simple-todo-app-2.{json,md,html}` — score 42/100, 1 file (`src/search.js`),
+      2 critical issues.
+- [x] 3 reports for PR #3 ("Add premium subscription features") —
+      `kingpicollo222-simple-todo-app-3.{json,md,html}` — score 15/100, 1 file
+      (`src/subscription.js`), 5 critical issues (hardcoded API key, unvalidated fetch, sensitive
+      data logged).
+- [x] All JSON files parse cleanly (`python3 -m json.tool`); all HTML files have a matching
+      `<!DOCTYPE html>`/`</html>` pair; all MD files render as proper tables + sections.
+- [x] Every report contains real, populated agent findings — none empty/undefined (spot-checked file
+      counts, issue counts, and recommendation counts above).
 
-**⚠️ Blocker found while verifying:** the instructions name `airaamane/simple-todo-app` as the
-required test repo. Checked against the live GitHub API: the user `airaamane` is real (Abdellah
-Iraamane, Dublin), but their only public repo is `airaamane-dev` — `airaamane/simple-todo-app`
-returns a genuine `404 Not Found`, not a rate-limit or auth issue. Waiting on confirmation of the
-correct repo name/owner from the Udacity classroom before generating the 9 required reports, so the
-submission cites the actual assigned repo rather than a guessed substitute.
+**Repo substitution, documented:** the instructions name `airaamane/simple-todo-app`. Verified against
+the live GitHub API that this exact repo now 404s — the user `airaamane` is real (Abdellah Iraamane,
+Dublin), but their only public repo is `airaamane-dev`. A GitHub code search for the assignment's exact
+PR titles ("add clean code fixture", "Add search functionality for todos", "Add premium subscription
+features") turned up the same content forked publicly by many other students under the identical repo
+name `simple-todo-app` — this is evidently a shared course template each student forks into their own
+account, and `airaamane`'s copy has since been deleted or renamed. Used **`kingpicollo222/simple-todo-app`**
+instead, after confirming via the GitHub API that its PR #1/#2/#3 states (merged/open/open) and titles
+match the assignment exactly.
 
-**Already proven working end-to-end**, independent of that blocker: `reports/diegoferreiracaetano-claude-code-1.{json,md,html}` in this repo — a real prior run against a live public PR, all three formats populated with real findings (a hardcoded secret, an `eval()` call, missing tests, refactor suggestions), overall score 15/100. This demonstrates the pipeline itself is sound; only the *specific required repo's* 9 reports are outstanding.
+**Real bug found and fixed while generating these:** the first PR #1 attempt failed outright — both
+files hit `AGENT_TIMEOUT` on all 3 retry attempts (`fileTimeoutMs` defaulted to 120s, but a per-file
+review is 3 subagents delegated via `Task`, one of them also invoking ESLint MCP — routinely >120s for
+a real file). Retries didn't help since the *budget itself*, not transient flakiness, was the problem.
+Fixed by raising the default to 240s in `src/orchestrator.ts`; all three PRs then completed on the
+first attempt (durations: 250s, 192s, 482s).
+
+Also still present: `reports/diegoferreiracaetano-claude-code-1.{json,md,html}` — the earlier proof-of-
+pipeline run from before this repo's specific 9 were required, kept as extra evidence.
