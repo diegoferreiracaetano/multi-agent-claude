@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env
+*.log
+logs/
+.DS_Store
+.vscode/
+.idea/
+coverage/
+*.tsbuildinfo
+.temp/
+
+# NOTE: reports/ is NOT ignored in this submission repo — the 9 PR analysis
+# reports it contains are a required deliverable for this project.
