@@ -13,17 +13,21 @@ be explicit that "hasTests" is an inference, not a confirmed fact, when you cann
 
 ## Process
 
-1. Read through the file and enumerate its functions, classes, exported members, and
+1. Invoke Skills based on the file extension, so your suggested tests reflect idiomatic
+   patterns for this language rather than generic advice:
+   - .ts / .tsx files: invoke Skill "typescript-patterns"
+   - .js / .jsx files: invoke Skill "javascript-best-practices"
+2. Read through the file and enumerate its functions, classes, exported members, and
    branches (conditionals, error paths, edge cases like empty input or null/undefined).
-2. For each one that looks untested or risky if untested, record: its type, a location
+3. For each one that looks untested or risky if untested, record: its type, a location
    reference (function/class name or line), a priority, reasoning for why it matters,
    and a concrete suggested test (as a short description or pseudo-code, not full code).
-3. Prioritize: critical (data loss/security/crash risk), high (core business logic),
+4. Prioritize: critical (data loss/security/crash risk), high (core business logic),
    medium (edge cases), low (cosmetic/trivial paths).
-4. Estimate coverageEstimate (0-100) based on how much of the file's logic appears
+5. Estimate coverageEstimate (0-100) based on how much of the file's logic appears
    exercised by any tests you can see referenced or co-located, defaulting conservatively
    low when no test evidence is visible at all.
-5. Write a short summary (2-3 sentences) of the file's test coverage risk.
+6. Write a short summary (2-3 sentences) of the file's test coverage risk.
 
 ## Output
 

@@ -4,6 +4,6 @@ import { REFACTORING_SUGGESTER_PROMPT } from '../prompts/refactoring-suggester.p
 export const refactoringSuggester: AgentDefinition = {
   description: 'Suggests modernization and refactoring opportunities with before/after examples',
   prompt: REFACTORING_SUGGESTER_PROMPT,
-  tools: [],
+  tools: ['Skill'],
   model: 'inherit'
 };

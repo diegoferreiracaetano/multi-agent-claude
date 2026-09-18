@@ -4,6 +4,6 @@ import { TEST_COVERAGE_ANALYZER_PROMPT } from '../prompts/test-coverage-analyzer
 export const testCoverageAnalyzer: AgentDefinition = {
   description: 'Identifies untested code paths and prioritizes what needs test coverage',
   prompt: TEST_COVERAGE_ANALYZER_PROMPT,
-  tools: [],
+  tools: ['Skill'],
   model: 'inherit'
 };

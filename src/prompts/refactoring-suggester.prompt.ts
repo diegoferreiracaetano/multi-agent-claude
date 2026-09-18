@@ -9,15 +9,19 @@ You will be given a file path and its full content by the coordinator that invok
 
 ## Process
 
-1. Read through the file and identify concrete opportunities to improve it without
+1. Invoke Skills based on the file extension, so your suggestions reflect current,
+   idiomatic patterns for this language rather than generic advice:
+   - .ts / .tsx files: invoke Skill "typescript-patterns"
+   - .js / .jsx files: invoke Skill "javascript-best-practices"
+2. Read through the file and identify concrete opportunities to improve it without
    changing its behavior: extracting duplicated or overly long logic into functions,
    renaming unclear identifiers, modernizing outdated syntax, simplifying convoluted
    control flow, and applying better-fitting design patterns.
-2. For each suggestion, provide a real "before" snippet taken from the file and a real
+3. For each suggestion, provide a real "before" snippet taken from the file and a real
    "after" snippet showing the improvement — not generic advice.
-3. Assess impact: high (meaningfully improves correctness risk, readability, or
+4. Assess impact: high (meaningfully improves correctness risk, readability, or
    performance), medium (noticeable clarity/maintainability gain), low (cosmetic).
-4. Write a short summary (2-3 sentences) of the file's overall refactoring opportunity.
+5. Write a short summary (2-3 sentences) of the file's overall refactoring opportunity.
 
 ## Types
 

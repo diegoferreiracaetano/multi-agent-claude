@@ -197,7 +197,35 @@ retry count are only useful against different failure classes.** Retries help wh
 time). Diagnosing which kind of failure you're looking at — here, by noticing all 3 attempts failed the
 same way, not intermittently — is what tells you whether to add retries or raise the budget.
 
-## 10. Quick command reference
+## 10. `tools: []` is not "no special tools" — it's "no tools at all"
+
+Reviewer feedback (verified at runtime, not just a type-check assumption) caught a real bug:
+`test-coverage-analyzer.ts` and `refactoring-suggester.ts` were both defined with `tools: []`, while
+`code-quality-analyzer.ts` had `tools: ['Skill', ...eslintTools]`. The intent behind the empty arrays
+was "these two don't need MCP tools like ESLint" — but that's not what an empty array means.
+
+Per `AgentDefinition`'s own type comment in the SDK:
+
+```
+tools?: string[];  // Array of allowed tool names. If omitted, inherits all tools from parent.
+```
+
+*Omitting* `tools` inherits everything the parent session has. Setting `tools: []` is an **explicit,
+empty allowlist** — the agent gets nothing, not even tools its prompt assumes it can reach. Both
+prompts already instructed the model to "invoke Skill 'typescript-patterns'" etc., so the bug wasn't
+visible by reading the prompt text alone — it only shows up by checking the *tools array* against what
+the prompt actually asks the model to do, which is exactly how the reviewer caught it.
+
+**Fix:** `tools: ['Skill']` on both agents. Kept minimal (least-privilege) rather than inheriting
+everything or adding `mcp__eslint__lint` to agents that never call it.
+
+**The generalizable lesson:** when reviewing an `AgentDefinition`, "what tools does the prompt talk
+about invoking?" and "what's actually in the `tools` array?" are two separate questions, and only
+checking one of them isn't enough — the whole point of an explicit allowlist is that it can silently
+diverge from what the prompt assumes, with no compile-time or type-level signal that anything is wrong
+(both are just `string[]`).
+
+## 11. Quick command reference
 
 ```bash
 npm install

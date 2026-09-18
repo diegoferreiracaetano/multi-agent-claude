@@ -18,9 +18,9 @@ Mapped directly to the project rubric. Every item verified against real code/out
 - [x] Three agents in `src/agents/`: `code-quality-analyzer.ts`, `test-coverage-analyzer.ts`,
       `refactoring-suggester.ts`, each an `AgentDefinition` with a clear `description`.
 - [x] All three set `model: 'inherit'`.
-- [x] `code-quality-analyzer` includes the `Skill` tool (plus `mcp__eslint__lint`) — satisfies "at
-      least one subagent" for Skills integration. The other two carry `tools: []` (no external tools
-      needed for their analysis).
+- [x] All three agents include the `Skill` tool: `code-quality-analyzer` has `['Skill', ...eslintTools]`,
+      `test-coverage-analyzer` and `refactoring-suggester` have `['Skill']`. (Fixed from an earlier
+      `tools: []` on the latter two — see "Reviewer feedback addressed" below.)
 - [x] Three prompt files in `src/prompts/`, each naming its specific focus area and referencing the
       Zod schema shape it must return.
 - [x] Skills present in `.claude/skills/`: `javascript-best-practices` (provided),
@@ -97,3 +97,16 @@ first attempt (durations: 250s, 192s, 482s).
 
 Also still present: `reports/diegoferreiracaetano-claude-code-1.{json,md,html}` — the earlier proof-of-
 pipeline run from before this repo's specific 9 were required, kept as extra evidence.
+
+## Reviewer feedback addressed
+
+**Skill tool missing on two agents.** Real reviewer feedback (verified at runtime, not a type-check
+guess): `test-coverage-analyzer` and `refactoring-suggester` both had `tools: []` — an *explicit empty
+allowlist*, not "inherit," meaning those two subagents could not invoke `Skill` at all despite their
+prompts assuming domain-specific idiom knowledge. Fixed by setting `tools: ['Skill']` on both agent
+definitions, and adding matching Skill-invocation steps to both prompts (mirroring
+`code-quality-analyzer.prompt.ts`'s existing pattern: `.ts/.tsx` → `typescript-patterns`, `.js/.jsx` →
+`javascript-best-practices`). See `STUDY_GUIDE.md` §11 for the full root-cause writeup. Re-verified
+`npm run lint` and `npm test` (36 passed, 1 skipped) after the fix. The 9 already-submitted PR reports
+were generated before this fix and were intentionally **not** regenerated (cost/time call), so their
+`test-coverage`/`refactoring` sections reflect the pre-fix agents; the code itself is now correct.
